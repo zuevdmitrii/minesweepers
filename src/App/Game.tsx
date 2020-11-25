@@ -12,8 +12,8 @@ import { useRenderAwait } from "./useRenderAwait";
 import { useScrollEvent } from "./useScrollEvent";
 import { Waiting } from "./Waiting";
 
-const MAX_IN_GRID = 50;
-const HIDDEN_ELEMENTS = 5;
+const MAX_IN_GRID = 40;
+const HIDDEN_ELEMENTS = 8;
 const ELEMENT_SIZE = 20;
 
 export interface IGameProps {
@@ -224,6 +224,13 @@ export const Game = (props: IGameProps) => {
             </div>
           );
         })}
+        {startPoint.y + MAX_IN_GRID + HIDDEN_ELEMENTS < props.rows ? (
+          <div
+            style={{
+              height: `${(props.rows - (startPoint.y + MAX_IN_GRID + HIDDEN_ELEMENTS)) * ELEMENT_SIZE}px`,
+            }}
+          ></div>
+        ) : null}
       </div>
     </>
   );
