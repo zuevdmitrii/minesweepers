@@ -2,7 +2,6 @@ import path from "path";
 import express from "express";
 import React from "react";
 import ReactDOM from "react-dom/server";
-import { StaticRouter as Router } from "react-router";
 import cookieParser from "cookie-parser";
 import template from "./template";
 
