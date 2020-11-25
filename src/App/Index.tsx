@@ -5,9 +5,9 @@ import { Game } from "./Game";
 import "./Index.less";
 
 export const Index = () => {
-  const [rows, setRows] = useState("10");
-  const [cols, setCols] = useState("10");
-  const [bombs, setBombs] = useState("10");
+  const [rows, setRows] = useState("100");
+  const [cols, setCols] = useState("100");
+  const [bombs, setBombs] = useState("1");
   const [isStarted, setIsStarted] = useState(false)
   const [keyGame, setKeyGame] = useState(0)
 

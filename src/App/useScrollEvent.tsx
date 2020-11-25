@@ -1,6 +1,12 @@
 import { useState } from "react";
 
-export const useScrollEvent = (cols: number, rows: number, HIDDEN_ELEMENTS: number) => {
+export const useScrollEvent = (
+  cols: number,
+  rows: number,
+  HIDDEN_ELEMENTS: number,
+  ELEMENT_SIZE: number,
+  MAX_IN_GRID: number
+) => {
   const [startPoint, setStartPoint] = useState({
     x: 0,
     y: 0,
@@ -11,8 +17,8 @@ export const useScrollEvent = (cols: number, rows: number, HIDDEN_ELEMENTS: numb
 
   return {
     startPoint,
-    onScroll: (e:React.UIEvent<HTMLDivElement, UIEvent>) => {
-      e.preventDefault()
+    onScroll: (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      e.preventDefault();
       //@ts-ignore
       const scrollLeft = e.target.scrollLeft;
       //@ts-ignore
@@ -27,7 +33,8 @@ export const useScrollEvent = (cols: number, rows: number, HIDDEN_ELEMENTS: numb
       const scrollHeight = e.target.scrollHeight;
 
       const newStartPoint = { ...startPoint };
-      newStartPoint.xPrev = scrollLeft;
+
+      /*newStartPoint.xPrev = scrollLeft;
       if (
         scrollLeft + width > scrollWidth - 20 &&
         startPoint.x < cols - HIDDEN_ELEMENTS
@@ -48,44 +55,26 @@ export const useScrollEvent = (cols: number, rows: number, HIDDEN_ELEMENTS: numb
 
       if (scrollLeft < startPoint.xPrev && startPoint.x > 0) {
         newStartPoint.x-=1;
+      }*/
+
+      let tempX = Math.round(
+        (scrollLeft - HIDDEN_ELEMENTS * ELEMENT_SIZE) / ELEMENT_SIZE
+      );
+      if (tempX > cols - MAX_IN_GRID - HIDDEN_ELEMENTS) {
+        tempX = cols - MAX_IN_GRID - HIDDEN_ELEMENTS;
+      }
+      newStartPoint.x = tempX > 0 ? tempX : 0;
+
+      let temp = Math.round(
+        (scrollTop - HIDDEN_ELEMENTS * ELEMENT_SIZE) / ELEMENT_SIZE
+      );
+      if (temp > rows - MAX_IN_GRID - HIDDEN_ELEMENTS) {
+        temp = rows - MAX_IN_GRID - HIDDEN_ELEMENTS;
       }
 
-      if (scrollTop < 20 && startPoint.y > 0) {
-        newStartPoint.y = 0;
-        newStartPoint.yPrev = 0;
-      }
+      newStartPoint.y = temp > 0 ? temp : 0;
 
-      if (
-        scrollTop + height > scrollHeight - 20 &&
-        startPoint.y < rows - HIDDEN_ELEMENTS
-      ) {
-        newStartPoint.y = rows - HIDDEN_ELEMENTS;
-        newStartPoint.yPrev = scrollTop;
-      }
-
-      if (
-        scrollTop > startPoint.yPrev + 5 &&
-        startPoint.y < rows - HIDDEN_ELEMENTS
-      ) {
-        if (startPoint.yPrevAction !== -1) {
-          newStartPoint.y += 2;
-          newStartPoint.yPrevAction = 1
-        } else {
-          newStartPoint.yPrevAction = 0
-        }
-        newStartPoint.yPrev = scrollTop;
-      }
-
-      if (scrollTop < startPoint.yPrev - 5 && startPoint.y > 0) {
-        if (startPoint.yPrevAction !== 1) {
-          newStartPoint.y -= 2;
-          newStartPoint.yPrevAction = -1
-        } else {
-          newStartPoint.yPrevAction = 0
-        }
-        newStartPoint.yPrev = scrollTop;
-      }
       setStartPoint(newStartPoint);
-    }
-  }
-}
+    },
+  };
+};

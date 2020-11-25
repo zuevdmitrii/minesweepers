@@ -11,9 +11,9 @@ import "./Game.less";
 import { useRenderAwait } from "./useRenderAwait";
 import { useScrollEvent } from "./useScrollEvent";
 
-const MAX_IN_GRID = 20;
-const HIDDEN_ELEMENTS = 12;
-const ELEMENT_SIZE = 50;
+const MAX_IN_GRID = 50;
+const HIDDEN_ELEMENTS = 5;
+const ELEMENT_SIZE = 20;
 
 export interface IGameProps {
   cols: number;
@@ -26,11 +26,14 @@ export interface IGameProps {
 export const Game = (props: IGameProps) => {
   const [isStarted, setIsStarted] = useState(false);
   const [map, setMap] = useState<ICellContent[][] | null>(null);
+  const [isOver, setIsOver] = useState(false)
   const [bombMarked, setBombMarked] = useState(0);
   const { startPoint, onScroll } = useScrollEvent(
     props.cols,
     props.rows,
-    HIDDEN_ELEMENTS
+    HIDDEN_ELEMENTS,
+    ELEMENT_SIZE,
+    MAX_IN_GRID
   );
 
   const { callback } = useRenderAwait();
@@ -74,6 +77,7 @@ export const Game = (props: IGameProps) => {
         </div>
       )}
       <div
+        key={`isOver-${isOver}`}
         className="grid"
         onClick={(e) => {
           //@ts-ignore
@@ -87,6 +91,7 @@ export const Game = (props: IGameProps) => {
             }).then((res) => {
               setMap(res.newMap);
               if (res.isOver) {
+                setIsOver(true)
                 setMessage("Game over!");
               } else {
                 setMessage("");
@@ -142,10 +147,10 @@ export const Game = (props: IGameProps) => {
         }}
         onScroll={onScroll}
       >
-        {false && startPoint.y > HIDDEN_ELEMENTS ? (
+        {startPoint.y > HIDDEN_ELEMENTS ? (
           <div
             style={{
-              height: `${startPoint.yPrev}px`,
+              height: `${(startPoint.y - HIDDEN_ELEMENTS) * ELEMENT_SIZE}px`,
             }}
           ></div>
         ) : null}
@@ -169,6 +174,13 @@ export const Game = (props: IGameProps) => {
           }
           return (
             <div className={`grid__row ${index}`} key={index}>
+              {startPoint.x > HIDDEN_ELEMENTS ? (
+                <div
+                  style={{
+                    width: `${(startPoint.x - HIDDEN_ELEMENTS) * ELEMENT_SIZE}px`,
+                  }}
+                ></div>
+              ) : null}
               {row.map((cell, indexCell) => {
                 const customAttr = { ipos: `${index}`, jpos: `${indexCell}` };
                 if (
@@ -196,10 +208,18 @@ export const Game = (props: IGameProps) => {
                     <Cell
                       attrs={customAttr}
                       data={map ? map[index][indexCell] : null}
+                      isOver={isOver}
                     />
                   </div>
                 );
               })}
+              {startPoint.x + MAX_IN_GRID + HIDDEN_ELEMENTS < props.cols ? (
+                <div
+                  style={{
+                    width: `${(props.cols - (startPoint.x + MAX_IN_GRID + HIDDEN_ELEMENTS)) * ELEMENT_SIZE}px`,
+                  }}
+                ></div>
+              ) : null}
             </div>
           );
         })}
