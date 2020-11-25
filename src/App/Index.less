@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .app__container {
@@ -12,9 +13,17 @@
 
 .app__control-panel {
   height: 100px;
+  display: flex;
 }
 
 .app__game-area {
   height: calc(100vh - 100px);
   padding: 20px;
+}
+
+.control-panel__column {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }

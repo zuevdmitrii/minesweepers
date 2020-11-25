@@ -1,4 +1,5 @@
 import React from "react";
+import "./Input.less";
 
 export interface IInputProps {
   value: string;
@@ -9,9 +10,10 @@ export interface IInputProps {
 
 export const Input = (props: IInputProps) => {
   return (
-    <div>
-      {props.caption}
+    <div className="input">
+      <div>{props.caption}</div>
       <input
+        className="input__text"
         disabled={props.disabled}
         type="text"
         value={props.value}

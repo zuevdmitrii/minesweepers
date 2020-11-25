@@ -107,6 +107,7 @@ const ChangeStatus = (
   cols: number,
 ) => {
   const cell = newMap[i][j];
+  let isOver = false
   if (cell && cell.state === CellStates.opened) {
     return;
   }
@@ -132,21 +133,25 @@ const ChangeStatus = (
     newMap[i][j] = { ...newMap[i][j], state: CellStates.opened };
   } else {
     newMap[i][j] = { ...newMap[i][j], state: CellStates.explosioned };
+    isOver = true
   }
 
-  return queue
+  return {queue, isOver}
 };
 
-export const OpenCell = (
+
+export const OpenCell = async (
   map: ICellContent[][],
   i: number,
   j: number,
   rows: number,
-  cols: number
+  cols: number,
+  renderCallback: (map:ICellContent[][]) => Promise<void>
 ) => {
+  let isOver = false
   const cell = map[i][j];
   if (cell && cell.state === CellStates.opened) {
-    return map;
+    return {isOver, newMap: map};
   }
 
   const newMap = map.map((row) => {
@@ -156,18 +161,23 @@ export const OpenCell = (
   });
 
   const globalQueue = [{i, j}]
-  let qNum = 0
   const globalUnique:{[propname:string]: boolean} = {}
-
-  while (qNum < globalQueue.length) {
-    const queue = ChangeStatus(newMap, globalQueue[qNum].i, globalQueue[qNum].j, rows, cols);
-    queue.forEach(q => {
+  let timeStamp = Date.now()
+  for (let qNum=0; qNum < globalQueue.length; qNum++) {
+    const result = ChangeStatus(newMap, globalQueue[qNum].i, globalQueue[qNum].j, rows, cols);
+    isOver = isOver || result.isOver
+    result.queue.forEach(q => {
       if (!globalUnique[`${q.i}-${q.j}`]) {
         globalUnique[`${q.i}-${q.j}`] = true
         globalQueue.push(q)
       }
     })
-    qNum++
+
+    let long = Date.now() - timeStamp
+    if (long > 50) {
+      await renderCallback(newMap)
+      timeStamp = Date.now()
+    }
   }
-  return newMap;
+  return {isOver, newMap};
 };
