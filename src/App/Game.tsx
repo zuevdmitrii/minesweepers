@@ -10,6 +10,7 @@ import { Cell } from "./Cell";
 import "./Game.less";
 import { useRenderAwait } from "./useRenderAwait";
 import { useScrollEvent } from "./useScrollEvent";
+import { Waiting } from "./Waiting";
 
 const MAX_IN_GRID = 50;
 const HIDDEN_ELEMENTS = 5;
@@ -49,7 +50,7 @@ export const Game = (props: IGameProps) => {
     return array;
   }, [props.cols, props.rows]);
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<JSX.Element|string>("");
 
   useEffect(() => {
     if (props.bombs === bombMarked) {
@@ -86,7 +87,7 @@ export const Game = (props: IGameProps) => {
           const jPos = +element.attributes.jpos.value;
           if (isStarted) {
             OpenCell(map, iPos, jPos, props.rows, props.cols, () => {
-              setMessage(`We are thinking, but browser isn't freezed`);
+              setMessage(<Waiting />);
               return callback();
             }).then((res) => {
               setMap(res.newMap);
@@ -108,7 +109,7 @@ export const Game = (props: IGameProps) => {
               jPos
             );
             OpenCell(generatedMap, iPos, jPos, props.rows, props.cols, () => {
-              setMessage(`We are thinking, but browser isn't freezed`);
+              setMessage(<Waiting />);
               return callback();
             }).then((res) => {
               setMap(res.newMap);

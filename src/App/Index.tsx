@@ -15,8 +15,8 @@ export const Index = () => {
     <div className="app__container">
       <div className="app__control-panel">
         <div className="control-panel__column">
-          <Input value={rows} onChange={setRows} caption="Rows:" disabled={isStarted}/>
-          <Input value={cols} onChange={setCols} caption="Cols:" disabled={isStarted}/>
+          <Input value={rows} onChange={setRows} caption="Rows:" disabled={isStarted} id={'rows-input'}/>
+          <Input value={cols} onChange={setCols} caption="Cols:" disabled={isStarted} id={'cols-input'}/>
         </div>
         <div className="control-panel__column">
           <Input value={bombs} onChange={setBombs} caption="Bombs:" disabled={isStarted}/>
