@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { GetFirstIndex, GetLastIndex } from "../Classes/Calc";
 import {
   CellStates,
   Generator,
@@ -7,7 +8,9 @@ import {
 } from "../Classes/Generator";
 import { Button } from "../Library/Button";
 import { Cell } from "./Cell";
+import { FirstElement } from "./FirstElement";
 import "./Game.less";
+import { LastElement } from "./LastElement";
 import { useRenderAwait } from "./useRenderAwait";
 import { useScrollEvent } from "./useScrollEvent";
 import { Waiting } from "./Waiting";
@@ -27,7 +30,7 @@ export interface IGameProps {
 export const Game = (props: IGameProps) => {
   const [isStarted, setIsStarted] = useState(false);
   const [map, setMap] = useState<ICellContent[][] | null>(null);
-  const [isOver, setIsOver] = useState(false)
+  const [isOver, setIsOver] = useState(false);
   const [bombMarked, setBombMarked] = useState(0);
   const { startPoint, onScroll } = useScrollEvent(
     props.cols,
@@ -38,19 +41,7 @@ export const Game = (props: IGameProps) => {
   );
 
   const { callback } = useRenderAwait();
-
-  const grid = useMemo(() => {
-    const array: number[][] = [];
-    for (let i = 0; i < props.rows; i++) {
-      array[i] = [];
-      for (let j = 0; j < props.cols; j++) {
-        array[i][j] = j;
-      }
-    }
-    return array;
-  }, [props.cols, props.rows]);
-
-  const [message, setMessage] = useState<JSX.Element|string>("");
+  const [message, setMessage] = useState<JSX.Element | string>("");
 
   useEffect(() => {
     if (props.bombs === bombMarked) {
@@ -68,6 +59,69 @@ export const Game = (props: IGameProps) => {
       }
     }
   }, [props.bombs, bombMarked]);
+
+  //const grid =
+  const startRow = GetFirstIndex(
+    startPoint.y,
+    MAX_IN_GRID,
+    HIDDEN_ELEMENTS,
+    props.rows
+  );
+  const endRow = GetLastIndex(
+    startPoint.y,
+    MAX_IN_GRID,
+    HIDDEN_ELEMENTS,
+    props.rows
+  );
+  const startColumn = GetFirstIndex(
+    startPoint.x,
+    MAX_IN_GRID,
+    HIDDEN_ELEMENTS,
+    props.cols
+  );
+  const endColumn = GetLastIndex(
+    startPoint.x,
+    MAX_IN_GRID,
+    HIDDEN_ELEMENTS,
+    props.cols
+  );
+
+  const grid = [];
+  for (let i = startRow; i < endRow; i++) {
+    grid[i] = [
+      <FirstElement
+        key={'fe'}
+        style={"width"}
+        HIDDEN_ELEMENTS={HIDDEN_ELEMENTS}
+        currentStartPosition={startPoint.x}
+        ELEMENT_SIZE={ELEMENT_SIZE}
+      />,
+    ];
+    for (let j = startColumn; j < endColumn; j++) {
+      grid[i].push(
+        <div className="grid__cell" key={j}>
+          <Cell
+            i={`${i}`}
+            j={`${j}`}
+            data={map ? map[i][j] : null}
+            isOver={isOver}
+          />
+        </div>
+      );
+    }
+
+    grid[i].push(
+      <LastElement
+        key={'le'}
+        style={"width"}
+        ELEMENT_SIZE={ELEMENT_SIZE}
+        currentStartPosition={startPoint.x}
+        HIDDEN_ELEMENTS={HIDDEN_ELEMENTS}
+        MAX_IN_GRID={MAX_IN_GRID}
+        count={props.cols}
+      />
+    );
+  }
 
   return (
     <>
@@ -92,7 +146,7 @@ export const Game = (props: IGameProps) => {
             }).then((res) => {
               setMap(res.newMap);
               if (res.isOver) {
-                setIsOver(true)
+                setIsOver(true);
                 setMessage("Game over!");
               } else {
                 setMessage("");
@@ -148,89 +202,27 @@ export const Game = (props: IGameProps) => {
         }}
         onScroll={onScroll}
       >
-        {startPoint.y > HIDDEN_ELEMENTS ? (
-          <div
-            style={{
-              height: `${(startPoint.y - HIDDEN_ELEMENTS) * ELEMENT_SIZE}px`,
-            }}
-          ></div>
-        ) : null}
+        <FirstElement
+          style={"height"}
+          HIDDEN_ELEMENTS={HIDDEN_ELEMENTS}
+          currentStartPosition={startPoint.y}
+          ELEMENT_SIZE={ELEMENT_SIZE}
+        />
         {grid.map((row, index) => {
-          if (
-            index <
-              startPoint.y -
-                HIDDEN_ELEMENTS -
-                (startPoint.y + MAX_IN_GRID + HIDDEN_ELEMENTS > props.rows
-                  ? startPoint.y + MAX_IN_GRID + HIDDEN_ELEMENTS - props.rows
-                  : 0) ||
-            index >
-              startPoint.y +
-                MAX_IN_GRID +
-                HIDDEN_ELEMENTS +
-                (startPoint.y < HIDDEN_ELEMENTS
-                  ? HIDDEN_ELEMENTS - startPoint.y
-                  : 0)
-          ) {
-            return null;
-          }
           return (
             <div className={`grid__row ${index}`} key={index}>
-              {startPoint.x > HIDDEN_ELEMENTS ? (
-                <div
-                  style={{
-                    width: `${(startPoint.x - HIDDEN_ELEMENTS) * ELEMENT_SIZE}px`,
-                  }}
-                ></div>
-              ) : null}
-              {row.map((cell, indexCell) => {
-                const customAttr = { ipos: `${index}`, jpos: `${indexCell}` };
-                if (
-                  indexCell <
-                    startPoint.x -
-                      HIDDEN_ELEMENTS -
-                      (startPoint.x + MAX_IN_GRID + HIDDEN_ELEMENTS > props.cols
-                        ? startPoint.x +
-                          MAX_IN_GRID +
-                          HIDDEN_ELEMENTS -
-                          props.cols
-                        : 0) ||
-                  indexCell >
-                    startPoint.x +
-                      MAX_IN_GRID +
-                      HIDDEN_ELEMENTS +
-                      (startPoint.x < HIDDEN_ELEMENTS
-                        ? HIDDEN_ELEMENTS - startPoint.x
-                        : 0)
-                ) {
-                  return null;
-                }
-                return (
-                  <div className="grid__cell" key={indexCell} {...customAttr}>
-                    <Cell
-                      attrs={customAttr}
-                      data={map ? map[index][indexCell] : null}
-                      isOver={isOver}
-                    />
-                  </div>
-                );
-              })}
-              {startPoint.x + MAX_IN_GRID + HIDDEN_ELEMENTS < props.cols ? (
-                <div
-                  style={{
-                    width: `${(props.cols - (startPoint.x + MAX_IN_GRID + HIDDEN_ELEMENTS)) * ELEMENT_SIZE}px`,
-                  }}
-                ></div>
-              ) : null}
+              {row.map((cell, indexCell) => cell)}
             </div>
           );
         })}
-        {startPoint.y + MAX_IN_GRID + HIDDEN_ELEMENTS < props.rows ? (
-          <div
-            style={{
-              height: `${(props.rows - (startPoint.y + MAX_IN_GRID + HIDDEN_ELEMENTS)) * ELEMENT_SIZE}px`,
-            }}
-          ></div>
-        ) : null}
+        <LastElement
+          style={"height"}
+          ELEMENT_SIZE={ELEMENT_SIZE}
+          currentStartPosition={startPoint.y}
+          HIDDEN_ELEMENTS={HIDDEN_ELEMENTS}
+          MAX_IN_GRID={MAX_IN_GRID}
+          count={props.rows}
+        />
       </div>
     </>
   );
