@@ -9,8 +9,8 @@ const ssr = async ({ By, Key, until }, driver, pushToLog, url) => {
   await driver.wait(until.elementLocated(By.className('grid__cell'), 2000))
   const cells = await driver.findElements(By.className('grid__cell'))
   pushToLog('Check count of elements')
-  if (cells.length !== 3249) {
-    throw new Error(`SSR is wrong cells = ${cells.length}, but should be 3249`)
+  if (cells.length !== 1600) {
+    throw new Error(`SSR is wrong cells = ${cells.length}, but should be 1600`)
   }
 }
 
