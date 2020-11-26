@@ -8,6 +8,7 @@ export const Index = () => {
   const [rows, setRows] = useState("100");
   const [cols, setCols] = useState("100");
   const [bombs, setBombs] = useState("1");
+  const [HIDDEN_ELEMENTS, setHiddenElements] = useState("8")
   const [isStarted, setIsStarted] = useState(false)
   const [keyGame, setKeyGame] = useState(0)
 
@@ -26,6 +27,9 @@ export const Index = () => {
             setKeyGame(keyGame + 1)
           }} caption={'New Game'} />}
         </div>
+        <div className="control-panel__column">
+          <Input value={HIDDEN_ELEMENTS} onChange={setHiddenElements} caption="Hidden elements:" id={'hidden-input'}/>
+        </div>
       </div>
       <div className="app__game-area">
         <Game
@@ -33,6 +37,7 @@ export const Index = () => {
           rows={+rows}
           cols={+cols}
           bombs={+bombs}
+          HIDDEN_ELEMENTS={+HIDDEN_ELEMENTS}
           onStart={() => {
             setIsStarted(true)
           }}

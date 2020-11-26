@@ -16,18 +16,19 @@ import { useScrollEvent } from "./useScrollEvent";
 import { Waiting } from "./Waiting";
 
 const MAX_IN_GRID = 40;
-const HIDDEN_ELEMENTS = 8;
 const ELEMENT_SIZE = 20;
 
 export interface IGameProps {
   cols: number;
   rows: number;
   bombs: number;
+  HIDDEN_ELEMENTS: number;
   onStart: () => void;
   onStop: () => void;
 }
 
 export const Game = (props: IGameProps) => {
+  const { HIDDEN_ELEMENTS } = props
   const [isStarted, setIsStarted] = useState(false);
   const [map, setMap] = useState<ICellContent[][] | null>(null);
   const [isOver, setIsOver] = useState(false);
