@@ -99,14 +99,14 @@ export const Game = (props: IGameProps) => {
     ];
     for (let j = startColumn; j < endColumn; j++) {
       grid[i].push(
-        <div className="grid__cell" key={j}>
           <Cell
+            key={j}
+            className={'grid__cell'}
             i={`${i}`}
             j={`${j}`}
             data={map ? map[i][j] : null}
             isOver={isOver}
           />
-        </div>
       );
     }
 

@@ -7,6 +7,7 @@ export interface ICellProps {
   i: string;
   j: string;
   isOver: boolean;
+  className: string;
 }
 
 const getClassNameByData = (data: ICellContent | null, isOver: boolean) => {
@@ -36,13 +37,17 @@ const getClassNameByData = (data: ICellContent | null, isOver: boolean) => {
   return "cell__closed";
 };
 
-export const Cell = React.memo(({ data, i, j, isOver }: ICellProps) => {
-  const attrs = { ipos: `${i}`, jpos: `${j}` };
-  return (
-    <div {...attrs} className={`cell ${getClassNameByData(data, isOver)}`}>
-      {data && data.state === CellStates.opened && data.value > 0
-        ? data.value
-        : ""}
-    </div>
-  );
-});
+export const Cell = React.memo(
+  ({ data, i, j, isOver, className }: ICellProps) => {
+    const attrs = { ipos: `${i}`, jpos: `${j}` };
+    return (
+      <div className={className}>
+        <div {...attrs} className={`cell ${getClassNameByData(data, isOver)}`}>
+          {data && data.state === CellStates.opened && data.value > 0
+            ? data.value
+            : ""}
+        </div>
+      </div>
+    );
+  }
+);

@@ -90,7 +90,7 @@ export const Generator = (
         const isBomb = variaty > 0.9 || variaty > Math.random();
         if (isBomb) {
           bombLeft--;
-          map[i][j] = { value: -1, state: CellStates.closed };
+          map[i][j] = { value: MINE_VALUE, state: CellStates.closed };
           IncrementNeighbor(map, i, j, rows, cols);
         }
       }
